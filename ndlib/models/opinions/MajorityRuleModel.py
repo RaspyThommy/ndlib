@@ -48,7 +48,7 @@ class MajorityRuleModel(DiffusionModel):
         # - if tie all agents take opinion +1
         # - if not tie, all agents take majority opinion
 
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         if self.actual_iteration == 0:
             self.actual_iteration += 1
@@ -72,14 +72,14 @@ class MajorityRuleModel(DiffusionModel):
 
         # update status of nodes in discussion group
         delta = {}
-        status_delta = {st: 0 for st in self.available_statuses.values()}
+        status_delta = {st: 0 for st in list(self.available_statuses.values())}
 
         for listener in discussion_group:
             if majority_vote != self.status[listener]:
                 delta[listener] = majority_vote
 
                 status_delta[self.status[listener]] += 1
-                for x in self.available_statuses.values():
+                for x in list(self.available_statuses.values()):
                     if x != self.status[listener]:
                         status_delta[x] -= 1
 
@@ -87,7 +87,7 @@ class MajorityRuleModel(DiffusionModel):
 
         # fix
         node_count = {st: len([n for n in self.status if self.status[n] == st])
-                      for st in self.available_statuses.values()}
+                      for st in list(self.available_statuses.values())}
 
         self.actual_iteration += 1
 

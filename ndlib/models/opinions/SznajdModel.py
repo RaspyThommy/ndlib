@@ -35,7 +35,7 @@ class SznajdModel(DiffusionModel):
         # - select randomly one of its neighbours (speaker 2)
         # - if the two voters agree, their neighbours take their opinion
 
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         if self.actual_iteration == 0:
             self.actual_iteration += 1
@@ -48,7 +48,7 @@ class SznajdModel(DiffusionModel):
                         "node_count": node_count.copy(), "status_delta": status_delta.copy()}
 
         delta = {}
-        status_delta = {st: 0 for st in self.available_statuses.values()}
+        status_delta = {st: 0 for st in list(self.available_statuses.values())}
 
         # select a random node
         speaker1 = list(self.graph.nodes)[np.random.randint(0, self.graph.number_of_nodes())]
@@ -75,14 +75,14 @@ class SznajdModel(DiffusionModel):
                 if self.status[speaker1] != self.status[listener]:
                     delta[listener] = self.status[speaker1]
                     status_delta[self.status[listener]] += 1
-                    for x in self.available_statuses.values():
+                    for x in list(self.available_statuses.values()):
                         if x != self.status[listener]:
                             status_delta[x] -= 1
 
                 self.status[listener] = self.status[speaker1]
 
         node_count = {st: len([n for n in self.status if self.status[n] == st])
-                      for st in self.available_statuses.values()}
+                      for st in list(self.available_statuses.values())}
 
         self.actual_iteration += 1
 

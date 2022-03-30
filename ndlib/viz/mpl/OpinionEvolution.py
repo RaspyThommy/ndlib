@@ -47,7 +47,7 @@ class OpinionEvolution(object):
         for it in self.srev:
             sts = it['status']
             its = it['iteration']
-            for n, v in sts.items():
+            for n, v in list(sts.items()):
                 if n in nodes2opinions:
                     last_id = last_seen[n]
                     last_value = nodes2opinions[n][last_id]

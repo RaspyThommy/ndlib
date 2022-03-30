@@ -212,7 +212,7 @@ class UTLDRModel(DiffusionModel):
         :return:
         """
 
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         actual_status = {node: nstatus for node, nstatus in future.utils.iteritems(self.status)}
 
@@ -522,7 +522,7 @@ class UTLDRModel(DiffusionModel):
             size = min(int(len(neighbors) * (1 - filtering_prob)), len(remaining_candidates))
         else:
             houseold_max_size = self.params['model']['epsilon_l']
-            size = list(np.random.choice(a=range(houseold_max_size), size=1))[0]
+            size = list(np.random.choice(a=list(range(houseold_max_size)), size=1))[0]
 
         # filtering contacts
         to_keep = list(np.random.choice(a=neighbors, size=size, replace=False))

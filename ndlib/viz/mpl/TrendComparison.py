@@ -26,7 +26,7 @@ class DiffusionTrendComparison(ComparisonPlot):
         for trend in self.trends:
             presences = {k: [] for k in self.classes}
             for t in trend:
-                for k in t['trends']['node_count'].keys():
+                for k in list(t['trends']['node_count'].keys()):
                     if self.srev[self.mnames[i]][k] in presences:
                         presences[self.srev[self.mnames[i]][k]].append(np.array(t['trends']['node_count'][k]))
 

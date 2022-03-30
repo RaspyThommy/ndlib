@@ -24,7 +24,7 @@ class ContinuousModelRunner(object):
             n_constants = len(constants_list)
 
         for i in range(N):
-            print('\nRunning simulation ' + str(i + 1) + '/' + str(N) + '\n')
+            print(('\nRunning simulation ' + str(i + 1) + '/' + str(N) + '\n'))
             if constants_list:
                 self.model.constants = constants_list[i % n_constants]
             self.model.set_initial_status(initial_statuses[i % n_initial_statuses], self.config)
@@ -53,10 +53,10 @@ class ContinuousModelRunner(object):
             raise ValueError('Please use a SAType enum value for sa_type')
 
         problem = {
-            'num_vars': len(bounds.keys()),
-            'names': [var for var in bounds.keys()],
+            'num_vars': len(list(bounds.keys())),
+            'names': [var for var in list(bounds.keys())],
             'bounds': [
-                [lower, upper] for _, (lower, upper) in bounds.items()
+                [lower, upper] for _, (lower, upper) in list(bounds.items())
             ]
         }
 
@@ -66,13 +66,13 @@ class ContinuousModelRunner(object):
 
         # Set the constants and run the model
         for i in range(len(param_values)):
-            print('Running simulation ' + str(i + 1) + '/' + str(len(param_values)))
+            print(('Running simulation ' + str(i + 1) + '/' + str(len(param_values))))
             # Set the constants
             for j, name in enumerate(problem['names']):
                 self.model.constants[name] = param_values[i,j]
             # Set intial values
             self.model.set_initial_status(initial_status, self.config)
-            outputs.append(self.model.iteration_bunch(iterations, node_status=self.node_status, progress_bar=False))
+            outputs.append(self.model.iteration_bunch(iterations, node_status=self.node_status, tqdm=False))
 
         # Parse the outputs for every simulation (TODO: Optimize)
         print('Parsing outputs...')
@@ -101,7 +101,7 @@ class ContinuousModelRunner(object):
         for output in outputs:
             # Get the average value of all the nodes for every status at the last iteration of the simulation
             means = self.model.get_means(output)
-            for status in val_dict.keys():
+            for status in list(val_dict.keys()):
                 val_dict[status] = np.append(val_dict[status], means[status][-1])
         return val_dict
 
@@ -109,6 +109,6 @@ class ContinuousModelRunner(object):
         for output in outputs:
             # Get the average value of all the nodes for every status at the last iteration of the simulation
             means = self.model.get_means(output)
-            for status in val_dict.keys():
+            for status in list(val_dict.keys()):
                 val_dict[status] = np.append(val_dict[status], means[status][-1])
         return val_dict

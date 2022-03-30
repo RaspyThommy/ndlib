@@ -1,5 +1,5 @@
 try:
-    from StringIO import StringIO
+    from io import StringIO
 except ImportError:
     from io import StringIO
 import sys
@@ -129,7 +129,7 @@ class ExperimentParser(object):
         sys.stdout = old_stdout
         result = json.loads(redirected_output.getvalue())
         trends = self.model.build_trends(result)
-        trends[0]['Statuses'] = {str(v): k for k, v in self.model.available_statuses.items()}
+        trends[0]['Statuses'] = {str(v): k for k, v in list(self.model.available_statuses.items())}
         return trends
 
     def __clean_imports(self):

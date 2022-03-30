@@ -71,9 +71,9 @@ class DiffusionModel(object):
             raise ConfigurationException("'Infected' status not defined.")
 
         # Checking mandatory parameters
-        omp = set([k for k in self.parameters['model'].keys() if not self.parameters['model'][k]['optional']])
-        onp = set([k for k in self.parameters['nodes'].keys() if not self.parameters['nodes'][k]['optional']])
-        oep = set([k for k in self.parameters['edges'].keys() if not self.parameters['edges'][k]['optional']])
+        omp = set([k for k in list(self.parameters['model'].keys()) if not self.parameters['model'][k]['optional']])
+        onp = set([k for k in list(self.parameters['nodes'].keys()) if not self.parameters['nodes'][k]['optional']])
+        oep = set([k for k in list(self.parameters['edges'].keys()) if not self.parameters['edges'][k]['optional']])
 
         mdp = set(configuration.get_model_parameters().keys())
         ndp = set(configuration.get_nodes_configuration().keys())
@@ -92,9 +92,9 @@ class DiffusionModel(object):
                 raise ConfigurationException({"message": "Missing mandatory edge parameter(s)", "parameters": oep-edp})
 
         # Checking optional parameters
-        omp = set([k for k in self.parameters['model'].keys() if self.parameters['model'][k]['optional']])
-        onp = set([k for k in self.parameters['nodes'].keys() if self.parameters['nodes'][k]['optional']])
-        oep = set([k for k in self.parameters['edges'].keys() if self.parameters['edges'][k]['optional']])
+        omp = set([k for k in list(self.parameters['model'].keys()) if self.parameters['model'][k]['optional']])
+        onp = set([k for k in list(self.parameters['nodes'].keys()) if self.parameters['nodes'][k]['optional']])
+        oep = set([k for k in list(self.parameters['edges'].keys()) if self.parameters['edges'][k]['optional']])
 
         if len(omp) > 0:
             for param in omp:
@@ -187,18 +187,17 @@ class DiffusionModel(object):
             if s not in valid_status:
                 self.status[n] = 0
 
-    def iteration_bunch(self, bunch_size, node_status=True, progress_bar=False):
+    def iteration_bunch(self, bunch_size, node_status=True):
         """
         Execute a bunch of model iterations
 
         :param bunch_size: the number of iterations to execute
         :param node_status: if the incremental node status has to be returned.
-        :param progress_bar: whether to display a progress bar, default False
 
         :return: a list containing for each iteration a dictionary {"iteration": iteration_id, "status": dictionary_node_to_status}
         """
         system_status = []
-        for it in tqdm.tqdm(past.builtins.xrange(0, bunch_size), disable=not progress_bar):
+        for it in tqdm.tqdm(past.builtins.xrange(0, bunch_size)):
             its = self.iteration(node_status)
             system_status.append(its)
         return system_status
@@ -330,13 +329,13 @@ class DiffusionModel(object):
         for n, v in future.utils.iteritems(self.status):
             delta[n] = {}
             status_delta[n] = {}
-            for var, val in v.items():
+            for var, val in list(v.items()):
                 if val != actual_status[n][var]:
                     delta[n][var] = actual_status[n][var]
                     status_delta[n][var] = actual_status[n][var] - val
-            if len(delta[n].values()) == 0:
+            if len(list(delta[n].values())) == 0:
                 del delta[n]
-            if len(status_delta[n].values()) == 0:
+            if len(list(status_delta[n].values())) == 0:
                 del status_delta[n]
 
         return delta, status_delta
@@ -349,11 +348,11 @@ class DiffusionModel(object):
         :param iterations: a set of iterations
         :return: a trend description
         """
-        status_delta = {status: [] for status in self.available_statuses.values()}
-        node_count = {status: [] for status in self.available_statuses.values()}
+        status_delta = {status: [] for status in list(self.available_statuses.values())}
+        node_count = {status: [] for status in list(self.available_statuses.values())}
 
         for it in iterations:
-            for st in self.available_statuses.values():
+            for st in list(self.available_statuses.values()):
                 try:
                     status_delta[st].append(it['status_delta'][st])
                     node_count[st].append(it['node_count'][st])

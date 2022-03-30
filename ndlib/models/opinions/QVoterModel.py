@@ -48,7 +48,7 @@ class QVoterModel(DiffusionModel):
         # - select randomly q of its neighbours (speakers)
         # - if the q neighbours agree, the listener takes their opinion
 
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         if self.actual_iteration == 0:
             self.actual_iteration += 1
@@ -76,19 +76,19 @@ class QVoterModel(DiffusionModel):
 
         delta = {}
         # if all neighbours agree (either on 0 or on 1)
-        status_delta = {st: 0 for st in self.available_statuses.values()}
+        status_delta = {st: 0 for st in list(self.available_statuses.values())}
 
         if sum(influence_group_state) == 0 or sum(influence_group_state) == len(influence_group_state):
             # update status of listener to either on of the neighbours selected
             delta[listener] = influence_group_state[0]
             self.status[listener] = influence_group_state[0]
             status_delta[self.status[listener]] += 1
-            for x in self.available_statuses.values():
+            for x in list(self.available_statuses.values()):
                 if x != self.status[listener]:
                     status_delta[x] -= 1
         # fix
         node_count = {st: len([n for n in self.status if self.status[n] == st])
-                      for st in self.available_statuses.values()}
+                      for st in list(self.available_statuses.values())}
 
         self.actual_iteration += 1
 

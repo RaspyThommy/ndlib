@@ -74,12 +74,12 @@ class ContinuousModel(DiffusionModel):
         if visualization_configuration:
             print('Configuring visualization...')
             self.visualization_configuration = visualization_configuration
-            vis_keys = visualization_configuration.keys()
+            vis_keys = list(visualization_configuration.keys())
 
             self.validate_plot_config(visualization_configuration, vis_keys)
             self.validate_color_config(vis_keys)
 
-            if 'pos' not in self.graph.nodes[0].keys():
+            if 'pos' not in list(self.graph.nodes[0].keys()):
                 self.configure_layout(vis_keys)
 
             if 'variable_limits' not in vis_keys:
@@ -110,10 +110,10 @@ class ContinuousModel(DiffusionModel):
                     pos = self.visualization_configuration['layout'](self.graph.graph, **self.visualization_configuration['layout_params'])
                 else:
                     pos = self.visualization_configuration['layout'](self.graph.graph)
-                positions = {key: {'pos': location} for key, location in pos.items()}
+                positions = {key: {'pos': location} for key, location in list(pos.items())}
         else:
             pos = nx.drawing.spring_layout(self.graph.graph)
-            positions = {key: {'pos': location} for key, location in pos.items()}
+            positions = {key: {'pos': location} for key, location in list(pos.items())}
 
         nx.set_node_attributes(self.graph, positions)
 
@@ -137,7 +137,7 @@ class ContinuousModel(DiffusionModel):
         else:
             self.visualization_configuration['plot_variable'] = None
 
-        if 'plot_title' in self.visualization_configuration.keys():
+        if 'plot_title' in list(self.visualization_configuration.keys()):
             if not isinstance(self.visualization_configuration['plot_title'], str):
                 raise ValueError('Plot name must be a string')
         else:
@@ -205,7 +205,7 @@ class ContinuousModel(DiffusionModel):
         # set node status
         for node in self.status:
             status = {}
-            for status_fun in initial_status_funs.items():
+            for status_fun in list(initial_status_funs.items()):
                 if hasattr(status_fun[1], '__call__'):
                     status[status_fun[0]] = status_fun[1](node, self.graph, status, self.constants)
                     continue
@@ -222,7 +222,7 @@ class ContinuousModel(DiffusionModel):
         For every status, set it to 0 if negative, or to 1 if > 1
         """
         for n, s in future.utils.iteritems(self.status):
-            for var_val in s.items():
+            for var_val in list(s.items()):
                 if var_val[1] > 1:
                     self.status[n][var_val[0]] = 1
                 elif var_val[1] < 0:
@@ -288,17 +288,22 @@ class ContinuousModel(DiffusionModel):
             return {"iteration": self.actual_iteration - 1, "status": {},
                     "status_delta": copy.deepcopy(status_delta)}
 
-    def iteration_bunch(self, bunch_size, node_status=True, progress_bar=False):
+    def iteration_bunch(self, bunch_size, node_status=True, tqdm=True):
         """
         Execute bunch_size of model iterations and save the result if save_file is set
 
         :param bunch_size: integer number of iterations to execute
         :param node_status: boolean indicating whether to keep the statuses of the nodes
-        :param progress_bar: boolean indicating whether to use tqdm to show the estimated duration
+        :param tqdm: boolean indicating whether to use tqdm to show the estimated duration
 
         :return: list of outputs for every iteration
         """
-        iterations = super().iteration_bunch(bunch_size, node_status, progress_bar=progress_bar)
+        if tqdm:
+            iterations = super().iteration_bunch(bunch_size, node_status)
+        else:
+            iterations = []
+            for _ in range(bunch_size):
+                iterations.append(self.iteration(node_status))
 
         if self.save_file:
             split = self.save_file.split('/')
@@ -307,7 +312,7 @@ class ContinuousModel(DiffusionModel):
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
             np.save(self.save_file, iterations)
-            print('Saved ' + self.save_file)
+            print(('Saved ' + self.save_file))
         return iterations
 
     def get_mean_data(self, iterations, mean_type):
@@ -322,7 +327,7 @@ class ContinuousModel(DiffusionModel):
             and as value a list of the average values of all nodes for that status per iteration
         """
         mean_changes = {}
-        for key in self.available_statuses.keys():
+        for key in list(self.available_statuses.keys()):
             mean_changes[key] = []
         del mean_changes['Infected'] # Todo, fix this line so that infected isn't even in available statuses
 
@@ -332,20 +337,20 @@ class ContinuousModel(DiffusionModel):
             vals = list(it[mean_type].values())
 
             for val in vals:
-                for key, v in val.items():
-                    if key not in delta.keys():
+                for key, v in list(val.items()):
+                    if key not in list(delta.keys()):
                         delta[key] = {'v': v, 'n': 1}
                     else:
                         delta[key]['v'] += v
                         delta[key]['n'] += 1
-            for key in mean_changes.keys():
-                if key not in delta.keys():
+            for key in list(mean_changes.keys()):
+                if key not in list(delta.keys()):
                     delta[key] = {}
                     delta[key]['v'] = 0
                     delta[key]['n'] = 1
 
-            for k, v in delta.items():
-                if k not in mean_changes.keys():
+            for k, v in list(delta.items()):
+                if k not in list(mean_changes.keys()):
                     mean_changes[k] = []
                 mean_changes[k].append(delta[k]['v'] / delta[k]['n'])
 
@@ -362,14 +367,14 @@ class ContinuousModel(DiffusionModel):
         """
         statuses = []
         status = {'iteration': 0, 'status': {}}
-        for key, val in iterations[0]['status'].items():
+        for key, val in list(iterations[0]['status'].items()):
             status['status'][key] = val
         statuses.append(status)
         for it in iterations[1:]:
             i = it['iteration']
             status = copy.deepcopy(statuses[-1])
-            for node, d in it['status'].items():
-                for var, val in d.items():
+            for node, d in list(it['status'].items()):
+                for var, val in list(d.items()):
                     status['status'][node][var] = val
                     status['iteration'] = i
             statuses.append(status)
@@ -418,19 +423,19 @@ class ContinuousModel(DiffusionModel):
 
         # Mean status delta per iterations
         if delta or delta_mean:
-            for status, values in trends['means'].items():
+            for status, values in list(trends['means'].items()):
                 axs[0].plot(x, values, label=status)
             axs[0].set_title("Mean values per variable per iteration")
             axs[0].legend()
         else:
-            for status, values in trends['means'].items():
+            for status, values in list(trends['means'].items()):
                 plt.plot(x, values, label=status)
             plt.title("Mean values per variable per iteration")
             plt.legend()
 
 
         if delta:
-            for status, values in trends['status_delta'].items():
+            for status, values in list(trends['status_delta'].items()):
                 axs[1].plot(x, values, label=status)
             axs[1].set_title("Mean change per variable per iteration")
             axs[1].legend()
@@ -438,7 +443,7 @@ class ContinuousModel(DiffusionModel):
         i = 2 if delta else 1
 
         if delta_mean:
-            for status, values in trends['mean_delta_status_vals'].items():
+            for status, values in list(trends['mean_delta_status_vals'].items()):
                 axs[i].plot(x, values, label=status)
             axs[i].set_title("Mean value of changed variables per iteration")
             axs[i].legend()
@@ -467,7 +472,7 @@ class ContinuousModel(DiffusionModel):
         for i in range(len(self.full_status)):
             if i % self.visualization_configuration['plot_interval'] == 0:
                 status_list = {key: [] for key in statuses}
-                for node in self.full_status[i]['status'].keys():
+                for node in list(self.full_status[i]['status'].keys()):
                     vals = self.full_status[i]['status'][node]
                     for key in statuses:
                         status_list[key].append(vals[key])
@@ -559,7 +564,7 @@ class ContinuousModel(DiffusionModel):
         if self.visualization_configuration['show_plot']:
             plt.show()
 
-        if 'plot_output' in self.visualization_configuration.keys():
+        if 'plot_output' in list(self.visualization_configuration.keys()):
             self.save_plot(simulation)
 
     def save_plot(self, simulation):
@@ -569,7 +574,7 @@ class ContinuousModel(DiffusionModel):
 
         :param simulation: Output of the matplotlib animation.FuncAnimation function
         """
-        print('Saving plot at: ' + self.visualization_configuration['plot_output'] + ' ...')
+        print(('Saving plot at: ' + self.visualization_configuration['plot_output'] + ' ...'))
         split = self.visualization_configuration['plot_output'].split('/')
         file_name = split[-1]
         file_path = self.visualization_configuration['plot_output'].replace(file_name, '')
@@ -579,4 +584,4 @@ class ContinuousModel(DiffusionModel):
         from PIL import Image
         writergif = animation.PillowWriter(fps=5)
         simulation.save(self.visualization_configuration['plot_output'], writer=writergif)
-        print('Saved: ' + self.visualization_configuration['plot_output'])
+        print(('Saved: ' + self.visualization_configuration['plot_output']))

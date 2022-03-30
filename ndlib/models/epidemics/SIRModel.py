@@ -10,7 +10,6 @@ __email__ = "giulio.rossetti@gmail.com"
 class SIRModel(DiffusionModel):
     """
        Model Parameters to be specified via ModelConfig
-
        :param beta: The infection rate (float value in [0,1])
        :param gamma: The recovery rate (float value in [0,1])
     """
@@ -18,7 +17,6 @@ class SIRModel(DiffusionModel):
     def __init__(self, graph, seed=None):
         """
              Model Constructor
-
              :param graph: A networkx graph object
          """
         super(self.__class__, self).__init__(graph, seed)
@@ -55,13 +53,12 @@ class SIRModel(DiffusionModel):
     def iteration(self, node_status=True):
         """
         Execute a single model iteration
-
         :return: Iteration_id, Incremental node status (dictionary node->status)
         """
         self.clean_initial_status(self.available_statuses.values())
 
-        actual_status = {node: nstatus for node, nstatus in future.utils.iteritems(self.status)}
-        self.active = [node for node, nstatus in future.utils.iteritems(self.status) if nstatus != self.available_statuses['Susceptible']]
+        actual_status = {node: nstatus for node, nstatus in self.status.items()}
+        self.active = [node for node, nstatus in self.status.items() if nstatus == self.available_statuses['Infected']]
 
         if self.actual_iteration == 0:
             self.actual_iteration += 1
@@ -75,22 +72,22 @@ class SIRModel(DiffusionModel):
 
         for u in self.active:
 
-            u_status = self.status[u]
-                        
-            if u_status == 1:
+            # if self.graph.directed:
+            #     susceptible_neighbors = [v for v in self.graph.successors(u) if self.status[v] == 0]
+            # else:
+            #     susceptible_neighbors = [v for v in self.graph.neighbors(u) if self.status[v] == 0]
 
-                if self.graph.directed:
-                    susceptible_neighbors = [v for v in self.graph.successors(u) if self.status[v] == 0]
-                else:
-                    susceptible_neighbors = [v for v in self.graph.neighbors(u) if self.status[v] == 0]
-                for v in susceptible_neighbors:
-                    eventp = np.random.random_sample()
-                    if eventp < self.params['model']['beta']:
-                        actual_status[v] = 1
+            get_neighbors = self.graph.out_edges() if self.graph.is_directed() else self.graph.edges
+            susceptible_neighbors = [d for _, d, info in get_neighbors(u, data=True) if self.status[d] == 0]
 
+            for v in susceptible_neighbors:
                 eventp = np.random.random_sample()
-                if eventp < self.params['model']['gamma']:
-                    actual_status[u] = 2
+                if eventp < self.params['model']['beta']:
+                    actual_status[v] = 1
+
+            eventp = np.random.random_sample()
+            if eventp < self.params['model']['gamma']:
+                actual_status[u] = 2
 
         delta, node_count, status_delta = self.status_delta(actual_status)
         self.status = actual_status
@@ -102,4 +99,3 @@ class SIRModel(DiffusionModel):
         else:
             return {"iteration": self.actual_iteration - 1, "status": {},
                     "node_count": node_count.copy(), "status_delta": status_delta.copy()}
-

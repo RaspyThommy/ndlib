@@ -38,7 +38,7 @@ class NodeNumericalAttribute(Compartiment):
 
     def execute(self, node, graph, status, status_map, *args, **kwargs):
 
-        val = nx.get_node_attributes(graph, self.attribute)[node]
+        val = graph.get_node_attributes(self.attribute)[node]
         p = np.random.random_sample()
 
         if self.operator == "IN":

@@ -155,9 +155,9 @@ class DynamicDiffusionModel(DiffusionModel):
             raise ConfigurationException("'Infected' status not defined.")
 
         # Checking mandatory parameters
-        omp = set([k for k in self.parameters['model'].keys() if not self.parameters['model'][k]['optional']])
-        onp = set([k for k in self.parameters['nodes'].keys() if not self.parameters['nodes'][k]['optional']])
-        oep = set([k for k in self.parameters['edges'].keys() if not self.parameters['edges'][k]['optional']])
+        omp = set([k for k in list(self.parameters['model'].keys()) if not self.parameters['model'][k]['optional']])
+        onp = set([k for k in list(self.parameters['nodes'].keys()) if not self.parameters['nodes'][k]['optional']])
+        oep = set([k for k in list(self.parameters['edges'].keys()) if not self.parameters['edges'][k]['optional']])
 
         mdp = set(configuration.get_model_parameters().keys())
         ndp = set(configuration.get_nodes_configuration().keys())
@@ -176,9 +176,9 @@ class DynamicDiffusionModel(DiffusionModel):
                 raise ConfigurationException({"message": "Missing mandatory edge parameter(s)", "parameters": oep-edp})
 
         # Checking optional parameters
-        omp = set([k for k in self.parameters['model'].keys() if self.parameters['model'][k]['optional']])
-        onp = set([k for k in self.parameters['nodes'].keys() if self.parameters['nodes'][k]['optional']])
-        oep = set([k for k in self.parameters['edges'].keys() if self.parameters['edges'][k]['optional']])
+        omp = set([k for k in list(self.parameters['model'].keys()) if self.parameters['model'][k]['optional']])
+        onp = set([k for k in list(self.parameters['nodes'].keys()) if self.parameters['nodes'][k]['optional']])
+        oep = set([k for k in list(self.parameters['edges'].keys()) if self.parameters['edges'][k]['optional']])
 
         if len(omp) > 0:
             for param in omp:

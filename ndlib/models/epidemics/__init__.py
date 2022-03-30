@@ -11,6 +11,7 @@ from .SEIRModel import SEIRModel
 from .SEISModel import SEISModel
 from .SIModel import SIModel
 from .SIRModel import SIRModel
+from .SIRModel_Custom import SIRModel_Custom
 from .SISModel import SISModel
 from .SWIRModel import SWIRModel
 from .ThresholdModel import ThresholdModel
@@ -21,7 +22,6 @@ from .GeneralThresholdModel import GeneralThresholdModel
 from .UTLDRModel import UTLDRModel
 from .SEIR_ct_Model import SEIRctModel
 from .SEIS_ct_Model import SEISctModel
-from .ForestFireModel import ForestFireModel
 
 __all__ = [
     'GeneralisedThresholdModel',
@@ -33,6 +33,7 @@ __all__ = [
     'SEISModel',
     'SIModel',
     'SIRModel',
+    'SIRModel_Custom',
     'SISModel',
     'SWIRModel',
     'ThresholdModel',
@@ -42,6 +43,5 @@ __all__ = [
     'UTLDRModel',
     'ICEPModel',
     'SEIRctModel',
-    'SEISctModel',
-    'ForestFireModel'
+    'SEISctModel'
 ]

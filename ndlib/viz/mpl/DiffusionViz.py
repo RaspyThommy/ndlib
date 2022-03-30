@@ -65,12 +65,12 @@ class DiffusionPlot(object):
                 continue
             mx = len(l[0])
             if self.normalized:
-                plt.plot(range(0, mx), l[1]/self.nnodes, lw=2, label=self.srev[k], alpha=0.5)  # , color=cols[i])
-                plt.fill_between(range(0,  mx), l[0]/self.nnodes, l[2]/self.nnodes, alpha=0.2)
+                plt.plot(list(range(0, mx)), l[1]/self.nnodes, lw=2, label=self.srev[k], alpha=0.5)  # , color=cols[i])
+                plt.fill_between(list(range(0,  mx)), l[0]/self.nnodes, l[2]/self.nnodes, alpha=0.2)
                     #,color=cols[i])
             else:
-                plt.plot(range(0, mx), l[1], lw=2, label=self.srev[k], alpha=0.5)  # , color=cols[i])
-                plt.fill_between(range(0, mx), l[0], l[2], alpha=0.2)  # ,color=cols[i])
+                plt.plot(list(range(0, mx)), l[1], lw=2, label=self.srev[k], alpha=0.5)  # , color=cols[i])
+                plt.fill_between(list(range(0, mx)), l[0], l[2], alpha=0.2)  # ,color=cols[i])
 
             i += 1
 

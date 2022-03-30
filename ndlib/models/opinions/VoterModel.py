@@ -35,7 +35,7 @@ class VoterModel(DiffusionModel):
         # - selecting randomly one of its peers (speaker)
         # - the first voter takes the opinion of the peer (listener takes the opinion of speaker)
 
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         if self.actual_iteration == 0:
             self.actual_iteration += 1
@@ -66,10 +66,10 @@ class VoterModel(DiffusionModel):
 
         # fix
         node_count = {st: len([n for n in self.status if self.status[n] == st])
-                      for st in self.available_statuses.values()}
-        status_delta = {st: 0 for st in self.available_statuses.values()}
+                      for st in list(self.available_statuses.values())}
+        status_delta = {st: 0 for st in list(self.available_statuses.values())}
         status_delta[self.status[speaker]] += 1
-        for x in self.available_statuses.values():
+        for x in list(self.available_statuses.values()):
             if x != self.status[speaker]:
                 status_delta[x] -= 1
 

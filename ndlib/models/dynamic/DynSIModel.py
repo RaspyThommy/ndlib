@@ -46,7 +46,7 @@ class DynSIModel(DynamicDiffusionModel):
 
         :return: Iteration_id, Incremental node status (dictionary node->status)
         """
-        self.clean_initial_status(self.available_statuses.values())
+        self.clean_initial_status(list(self.available_statuses.values()))
 
         actual_status = {node: nstatus for node, nstatus in future.utils.iteritems(self.status)}
 

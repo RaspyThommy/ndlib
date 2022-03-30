@@ -18,9 +18,9 @@ class DiffusionTrend(DiffusionPlot):
         self.title = "Diffusion Trend"
 
     def iteration_series(self, percentile=100):
-        series = {k: [] for k in self.srev.keys()}
+        series = {k: [] for k in list(self.srev.keys())}
 
-        presences = {k: [] for k in self.srev.keys()}
+        presences = {k: [] for k in list(self.srev.keys())}
         for t in self.trends:
 
             for st in t:
